@@ -3,23 +3,22 @@ import SwiftUI
 struct AnimatedText: View {
 
     @Binding var text: String
+    var font: Font = .body
+    var transition: AnyTransition = .rotate
 
     private var textArray: [String] {
         text.map({ String($0) })
     }
 
     var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 5.0)
-                .fill(Color.white)
-            HStack(spacing: 0) {
-                ForEach(textArray.indices, id: \.self) { index in
-                    Text(textArray[index]).transition(.rotate).id(textArray[index])
-                }
-            }.font(Font.custom("SFMono-Bold", size: 16.0))
-            .foregroundColor(.black)
-            .padding(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-        }.fixedSize()
+        HStack(spacing: 0) {
+            ForEach(textArray.indices, id: \.self) { index in
+                Text(textArray[index])
+                    .transition(transition)
+                    .id(textArray[index])
+            }
+        }.font(font)
+        .fixedSize()
     }
 
 }
@@ -74,12 +73,13 @@ private struct AnimatedTextDemo: View {
 
     var body: some View {
         VStack {
-            AnimatedText(text: $text)
+            AnimatedText(text: $text, font: Font.custom("SFMono-Bold", size: 16.0))
+                .padding()
             Button("Test") {
                 withAnimation {
                     text = text == "Hello" ? "World" : "Hello"
                 }
-            }
+            }.padding()
         }
     }
 
