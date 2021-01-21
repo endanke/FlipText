@@ -1,6 +1,6 @@
 import SwiftUI
 
-public struct AnimatedText: View {
+public struct FlipText: View {
 
     @Binding public var text: String
     public var font: Font = .body
@@ -67,13 +67,13 @@ struct RotateEffect: GeometryEffect {
 
 }
 
-private struct AnimatedTextDemo: View {
+private struct FlipTextDemo: View {
 
     @State var text = "Hello"
 
     var body: some View {
         VStack {
-            AnimatedText(text: $text, font: Font.custom("SFMono-Bold", size: 16.0))
+            FlipText(text: $text, font: Font.custom("SFMono-Bold", size: 16.0))
                 .padding()
             Button("Test") {
                 withAnimation {
@@ -89,7 +89,7 @@ struct LicensesView_Previews: PreviewProvider {
 
     static var previews: some View {
         VStack {
-            AnimatedTextDemo()
+            FlipTextDemo()
         }
     }
 
