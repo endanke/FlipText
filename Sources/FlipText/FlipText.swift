@@ -3,11 +3,21 @@ import SwiftUI
 public struct FlipText: View {
 
     @Binding public var text: String
-    public var font: Font = .body
-    public var transition: AnyTransition = .rotate
+    public var font: Font
+    public var transition: AnyTransition
 
     private var textArray: [String] {
         text.map({ String($0) })
+    }
+
+    public init(
+        text: Binding<String>,
+        font: Font = .body,
+        transition: AnyTransition = .rotate
+    ) {
+        self._text = text
+        self.font = font
+        self.transition = transition
     }
 
     public var body: some View {
@@ -25,7 +35,7 @@ public struct FlipText: View {
 
 extension AnyTransition {
 
-    static let rotate: AnyTransition = AnyTransition.modifier(
+    public static let rotate: AnyTransition = AnyTransition.modifier(
         active: RotateEffect(progress: 0),
         identity: RotateEffect(progress: 1)
     )
