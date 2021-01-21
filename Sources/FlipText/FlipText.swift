@@ -1,16 +1,16 @@
 import SwiftUI
 
-struct AnimatedText: View {
+public struct AnimatedText: View {
 
-    @Binding var text: String
-    var font: Font = .body
-    var transition: AnyTransition = .rotate
+    @Binding public var text: String
+    public var font: Font = .body
+    public var transition: AnyTransition = .rotate
 
     private var textArray: [String] {
         text.map({ String($0) })
     }
 
-    var body: some View {
+    public var body: some View {
         HStack(spacing: 0) {
             ForEach(textArray.indices, id: \.self) { index in
                 Text(textArray[index])
