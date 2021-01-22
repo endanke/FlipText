@@ -5,6 +5,7 @@ public struct FlipText: View {
     @Binding public var text: String
     public var font: Font
     public var transition: AnyTransition
+    public var background: AnyView?
 
     private var textArray: [String] {
         text.map({ String($0) })
@@ -13,17 +14,20 @@ public struct FlipText: View {
     public init(
         text: Binding<String>,
         font: Font = .body,
-        transition: AnyTransition = .rotate
+        transition: AnyTransition = .rotate,
+        background: AnyView? = nil
     ) {
         self._text = text
         self.font = font
         self.transition = transition
+        self.background = background
     }
 
     public var body: some View {
         HStack(spacing: 0) {
             ForEach(textArray.indices, id: \.self) { index in
                 Text(textArray[index])
+                    .background(background)
                     .transition(transition)
                     .id(textArray[index])
             }
@@ -35,9 +39,15 @@ public struct FlipText: View {
 
 extension AnyTransition {
 
-    public static let rotate: AnyTransition = AnyTransition.modifier(
-        active: RotateEffect(progress: 0),
-        identity: RotateEffect(progress: 1)
+    public static let rotate: AnyTransition = AnyTransition.asymmetric(
+        insertion: AnyTransition.modifier(
+            active: RotateEffect(progress: 0, insertion: true),
+            identity: RotateEffect(progress: 1, insertion: true)
+        ),
+        removal: AnyTransition.modifier(
+            active: RotateEffect(progress: 0, insertion: false),
+            identity: RotateEffect(progress: 1, insertion: false)
+        )
     )
 
 }
@@ -47,6 +57,7 @@ extension AnyTransition {
 struct RotateEffect: GeometryEffect {
 
     var progress: Double
+    var insertion: Bool
 
     var animatableData: Double {
         get { progress }
@@ -54,7 +65,7 @@ struct RotateEffect: GeometryEffect {
     }
 
     func effectValue(size: CGSize) -> ProjectionTransform {
-        let angle = CGFloat(Angle(degrees: 180.0 * (1.0 - progress)).radians)
+        let angle = CGFloat(Angle(degrees: (insertion ? 180.0 : -180) * (1.0 - progress)).radians)
 
         var transform3d = CATransform3DIdentity
         transform3d.m34 = -1/max(size.width, size.height)
@@ -64,8 +75,10 @@ struct RotateEffect: GeometryEffect {
         let affineTransform1 = ProjectionTransform(
             CGAffineTransform(translationX: size.width/2.0, y: size.height / 2.0)
         )
+
+        let scaleLevel: CGFloat = (insertion && progress <= 0.5) ? 0.0 : CGFloat(progress * 2)
         let affineTransform2 = ProjectionTransform(
-            CGAffineTransform(scaleX: CGFloat(progress * 2), y: CGFloat(progress * 2))
+            CGAffineTransform(scaleX: scaleLevel, y: scaleLevel)
         )
 
         if progress <= 0.5 {
@@ -83,8 +96,12 @@ private struct FlipTextDemo: View {
 
     var body: some View {
         VStack {
-            FlipText(text: $text, font: Font.custom("SFMono-Bold", size: 16.0))
-                .padding()
+            FlipText(
+                text: $text,
+                font: Font.custom("SFMono-Bold", size: 64.0),
+                background: AnyView(Color.gray)
+            ).animation(.easeIn(duration: 1.0))
+            .padding()
             Button("Test") {
                 withAnimation {
                     text = text == "Hello" ? "World" : "Hello"
