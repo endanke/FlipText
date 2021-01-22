@@ -99,15 +99,21 @@ private struct FlipTextDemo: View {
             FlipText(
                 text: $text,
                 font: Font.custom("SFMono-Bold", size: 64.0),
-                background: AnyView(Color.gray)
+                background: AnyView(Color.black)
             ).animation(.easeIn(duration: 1.0))
             .padding()
-            Button("Test") {
+            Button("Flip") {
                 withAnimation {
-                    text = text == "Hello" ? "World" : "Hello"
+                    if text == "World" {
+                        text = "Swift"
+                    } else if text == "Swift" {
+                        text = "Hello"
+                    } else {
+                        text = "World"
+                    }
                 }
             }.padding()
-        }
+        }.background(Color.black)
     }
 
 }
