@@ -6,7 +6,7 @@ let package = Package(
     name: "FlipText",
     platforms: [
         .macOS(.v10_15),
-        .iOS(.v10),
+        .iOS(.v13),
         .tvOS(.v13)
     ],
     products: [
