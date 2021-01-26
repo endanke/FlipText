@@ -41,21 +41,19 @@ extension AnyTransition {
 
     public static let rotate: AnyTransition = AnyTransition.asymmetric(
         insertion: AnyTransition.modifier(
-            active: RotateEffect(progress: 0, insertion: true),
-            identity: RotateEffect(progress: 1, insertion: true)
+            active: RotateScaleEffect(progress: 0, insertion: true),
+            identity: RotateScaleEffect(progress: 1, insertion: true)
         ),
         removal: AnyTransition.modifier(
-            active: RotateEffect(progress: 0, insertion: false),
-            identity: RotateEffect(progress: 1, insertion: false)
+            active: RotateScaleEffect(progress: 0, insertion: false),
+            identity: RotateScaleEffect(progress: 1, insertion: false)
         )
     )
 
 }
 
-// Source:
-// https://stackoverflow.com/a/62767038/1960938
-struct RotateEffect: GeometryEffect {
-
+struct RotateScaleEffect: AnimatableModifier {
+    
     var progress: Double
     var insertion: Bool
 
@@ -64,28 +62,11 @@ struct RotateEffect: GeometryEffect {
         set { progress = newValue }
     }
 
-    func effectValue(size: CGSize) -> ProjectionTransform {
-        let angle = CGFloat(Angle(degrees: (insertion ? 180.0 : -180) * (1.0 - progress)).radians)
-
-        var transform3d = CATransform3DIdentity
-        transform3d.m34 = -1/max(size.width, size.height)
-        transform3d = CATransform3DRotate(transform3d, angle, 1, 0, 0)
-        transform3d = CATransform3DTranslate(transform3d, -size.width/2.0, -size.height/2.0, 0)
-
-        let affineTransform1 = ProjectionTransform(
-            CGAffineTransform(translationX: size.width/2.0, y: size.height / 2.0)
-        )
-
-        let scaleLevel: CGFloat = (insertion && progress <= 0.5) ? 0.0 : CGFloat(progress * 2)
-        let affineTransform2 = ProjectionTransform(
-            CGAffineTransform(scaleX: scaleLevel, y: scaleLevel)
-        )
-
-        if progress <= 0.5 {
-            return ProjectionTransform(transform3d).concatenating(affineTransform2).concatenating(affineTransform1)
-        } else {
-            return ProjectionTransform(transform3d).concatenating(affineTransform1)
-        }
+    func body(content: Content) -> some View {
+        content
+            .opacity((insertion && progress <= 0.8) ? 0.0 : (progress * 2))
+            .rotation3DEffect(.init(degrees: progress * 180), axis: (1, 0, 0))
+            .scaleEffect(CGFloat(1.0 - progress) * 0.5 + 1.0)
     }
 
 }
