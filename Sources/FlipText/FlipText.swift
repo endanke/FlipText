@@ -39,7 +39,7 @@ public struct FlipText: View {
 
 extension AnyTransition {
 
-    public static let rotate: AnyTransition = AnyTransition.asymmetric(
+    public static let rotateScale: AnyTransition = AnyTransition.asymmetric(
         insertion: AnyTransition.modifier(
             active: RotateScaleEffect(progress: 0, insertion: true),
             identity: RotateScaleEffect(progress: 1, insertion: true)
@@ -49,25 +49,17 @@ extension AnyTransition {
             identity: RotateScaleEffect(progress: 1, insertion: false)
         )
     )
-
-}
-
-struct RotateScaleEffect: AnimatableModifier {
     
-    var progress: Double
-    var insertion: Bool
-
-    var animatableData: Double {
-        get { progress }
-        set { progress = newValue }
-    }
-
-    func body(content: Content) -> some View {
-        content
-            .opacity((insertion && progress <= 0.8) ? 0.0 : (progress * 2))
-            .rotation3DEffect(.init(degrees: progress * 180), axis: (1, 0, 0))
-            .scaleEffect(CGFloat(1.0 - progress) * 0.5 + 1.0)
-    }
+    public static let rotate: AnyTransition = AnyTransition.asymmetric(
+        insertion: AnyTransition.modifier(
+            active: RotateEffect(progress: 0, insertion: true),
+            identity: RotateEffect(progress: 1, insertion: true)
+        ),
+        removal: AnyTransition.modifier(
+            active: RotateEffect(progress: 0, insertion: false),
+            identity: RotateEffect(progress: 1, insertion: false)
+        )
+    )
 
 }
 
