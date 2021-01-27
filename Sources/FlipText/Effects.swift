@@ -19,7 +19,7 @@ struct RotateScaleEffect: AnimatableModifier {
 
 }
 
-// Source:
+// Based on:
 // https://stackoverflow.com/a/62767038/1960938
 struct RotateEffect: GeometryEffect {
 
@@ -43,12 +43,14 @@ struct RotateEffect: GeometryEffect {
             CGAffineTransform(translationX: size.width/2.0, y: size.height / 2.0)
         )
 
-        let scaleLevel: CGFloat = (insertion && progress <= 0.5) ? 0.0 : CGFloat(progress * 2)
         let affineTransform2 = ProjectionTransform(
-            CGAffineTransform(scaleX: scaleLevel, y: scaleLevel)
+            CGAffineTransform(scaleX: CGFloat(progress * 2), y: CGFloat(progress * 2))
         )
 
-        if progress <= 0.5 {
+        if insertion && progress <= 0.5 {
+            // Note: This hides the view with a non-zero transformation
+            return ProjectionTransform(CGAffineTransform(scaleX: .leastNonzeroMagnitude, y: .leastNonzeroMagnitude))
+        } else if progress <= 0.5 {
             return ProjectionTransform(transform3d).concatenating(affineTransform2).concatenating(affineTransform1)
         } else {
             return ProjectionTransform(transform3d).concatenating(affineTransform1)
