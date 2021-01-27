@@ -49,7 +49,7 @@ struct RotateEffect: GeometryEffect {
 
         if insertion && progress <= 0.5 {
             // Note: This hides the view with a non-zero transformation
-            return ProjectionTransform(CGAffineTransform(scaleX: .leastNonzeroMagnitude, y: .leastNonzeroMagnitude))
+            return ProjectionTransform(CGAffineTransform(scaleX: 0.000001, y: 0.000001))
         } else if progress <= 0.5 {
             return ProjectionTransform(transform3d).concatenating(affineTransform2).concatenating(affineTransform1)
         } else {
